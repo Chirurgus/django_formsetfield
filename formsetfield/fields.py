@@ -83,26 +83,31 @@ class FormsetField(Field):
     """
     Field that can have display an entire formset.
     """
-    widget = FormsetWidget
-    template_name = "...."
+    widget_class = FormsetWidget
+    prefix = "formset_field"
 
-    def __init__(self, *, formset, **kwargs):
-        super().__init__(**kwargs)
-        if formset is None:
+    def __init__(self, *, formset_class, **kwargs):
+        if formset_class is None:
             raise ValueError('formset argument has to be not None.')
-        self.initial = formset() if isinstance(formset, type) else formset
+        widget = self.widget_class(formset_class=formset_class,
+                                   prefix=self.prefix)
+        # Super will assign self.widget
+        super().__init__(widget=widget, **kwargs)
+        self.initial = formset_class(prefix=self.prefix)
 
     def clean(self, value):
         '''
         Return clean value from the raw value extracted from the widget.
         '''
-        pass
+        # value should just be a Formset with data
+        return value
   
     def to_python(self, value):
         ''' 
         Return a Django Formset instance.
         '''
-        pass
+        # value should already be a Formset with data
+        return value
 
 
     def get_prefix(self, form, name):

@@ -11,33 +11,20 @@ from django.views.generic import (
     CreateView,
 )
 
-from django.forms import (Form, formset_factory)
-from django.forms.fields import CharField
-
-from formsetfield.fields  import FormsetField
-
-class TestForm(Form):
-    name = CharField(max_length= 100)
-    description = CharField(max_length= 250)
-
-TestFormset = formset_factory(TestForm, extra=3)
-
-class TestFormsetForm(Form):
-    name = CharField(max_length=100)
-    test_forms = FormsetField(formset= TestFormset)
+from .forms import TestFormsetForm, TestNestedFormsetForm
 
 class TestView(View):
     template_name = 'testform.html'
 
     def get(self, request):
-        form = TestFormsetForm()
+        form = TestNestedFormsetForm()
 
         return render(request,
                       self.template_name,
                       { 'form' : form })
 
     def post(self, request):
-        form = TestFormsetForm(request.POST, request.FILES)
+        form = TestNestedFormsetForm(request.POST, request.FILES)
         
         if form.is_valid():
             return render(request, "sucess.html")

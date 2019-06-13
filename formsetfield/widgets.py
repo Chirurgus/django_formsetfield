@@ -8,9 +8,16 @@ class FormsetWidget(Widget):
     Displays an entire formset
     '''
     template_name = 'formsetwidget/formset.html'
+    needs_multipart_form = True
+    prefix = ''
 
+    def __init__(self, formset_class, prefix=None, *args, **kwargs):
+        if formset_class is None:
+            raise ValueError('formset argument has to be not None.')
 
-
+        super(FormsetWidget, self).__init__(*args, **kwargs)
+        self.formset_class = formset_class
+        self.prefix = prefix if prefix is not None else ""
 
     # This is where the money is!
     def value_from_datadict(self, data, files, name):
@@ -22,12 +29,13 @@ class FormsetWidget(Widget):
         than once during handling of form data, so if you customize it
         and add expensive processing, you should implement some caching mechanism yourself.
         '''
-        pass
+        # Return the formset populated with data
+        return self.formset_class(data, files, prefix= self.get_prefix())
 
     def value_omitted_from_data(self, data, files, name):
         '''
         Given data and files dictionaries and this widget’s name,
-        returns whether or not there’s data or files for the widget.
+        return whether or not there’s data or files for the widget.
         '''
         pass
 
@@ -38,6 +46,11 @@ class FormsetWidget(Widget):
         context['formset'] = value
         return context
 
+    def get_prefix(self):
+        return self.prefix
+
     # I think we need to override this since we have multiple HTML tags
     def id_for_label(self, id_):
-        return "formset_widget"
+        return id_ + "formset_widget"
+
+
