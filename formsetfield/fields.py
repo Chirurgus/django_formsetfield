@@ -135,6 +135,8 @@ class FormsetField(Field):
         Return clean value from the raw value extracted from the widget.
         '''
         # value should just be a Formset with data
+        # All we need to do is force clean
+        value.is_valid()
         return value
   
     def to_python(self, value):
