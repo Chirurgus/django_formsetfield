@@ -25,11 +25,15 @@ class TestView(View):
 
     def post(self, request):
         form = TestNestedFormsetForm(request.POST, request.FILES)
-        
+
+        # Look at the prefix
+        form.fields['nested_formset'].prefix
+
         if form.is_valid():
             return render(request, "sucess.html")
+
         else:
-            render(request,
+            return render(request,
                     self.template_name,
                     { 'form' : form })
 

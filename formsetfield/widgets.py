@@ -8,11 +8,11 @@ class FormsetWidget(Widget):
     Displays a formset.
 
     Meant to be used only with FormsetField, since
-    it has very close couping with it.
-    Notably FormsetField passes its own istance
+    it has very close coupling with it.
+    Notably FormsetField passes its own instance
     to this widget so that this widget can get
     up-to-date information about what prefix
-    to use. This is necessairy since the correct
+    to use. This is necessary since the correct
     prefix is not known on __init__ time.
     '''
     template_name = 'formsetwidget/formset.html'
@@ -26,13 +26,16 @@ class FormsetWidget(Widget):
         '''
         Extract value from HTML request data, and files,
         given the widget's name.
-        The value in this case is a Django Fieldset.
+        The value in this case is a Django FormSet.
         '''
         # Return the formset populated with data
         return self.field_instance.formset_class(
             data,
             files,
-            prefix= self.field_instance.prefix)
+            prefix= name) # the name is generated using add_prefix(name)
+                          # same way we generate the prefix, so we can 
+                          # use it to access the right formset, without
+                          # accessing self.field_instance.prefix
 
     def value_omitted_from_data(self, data, files, name):
         '''

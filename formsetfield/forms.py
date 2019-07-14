@@ -13,8 +13,4 @@ class InitFormsetFieldFormMixin(object):
         super().__init__(*args, prefix=prefix, **kwargs)
         for name, field in self.fields.items():
             if isinstance(field, FormsetField):
-                if prefix:
-                    new_prefix = prefix + "-" + name
-                else:
-                    new_prefix = name 
-                field.prefix = new_prefix
+                field.prefix = self.add_prefix(name)
