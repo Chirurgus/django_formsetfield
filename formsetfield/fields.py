@@ -96,7 +96,6 @@ class FormsetField(Field):
     the requirement to be in a form derving form it.
     """
     widget_class = FormsetWidget
-    prefix = "formset_field"
 
     def __init__(self, *, formset_class, **kwargs):
         # Ignore 'initial' argument
