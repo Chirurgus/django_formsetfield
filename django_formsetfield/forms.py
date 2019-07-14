@@ -9,7 +9,7 @@ class TestForm(InitFormsetFieldFormMixin,Form):
     name = CharField(max_length= 100)
 
 class TestInlineForm(InitFormsetFieldFormMixin, Form):
-    field = CharField(max_length=100)
+    field = CharField(max_length=10)
 
 TestFormset = formset_factory(TestInlineForm, extra=2)
 

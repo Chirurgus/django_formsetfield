@@ -9,8 +9,8 @@ class InitFormsetFieldFormMixin(object):
     it itself put into a formset there are
     no naming/id conflicts.
     '''
-    def __init__(self, prefix=None, *args, **kwargs):
-        super().__init__(prefix=prefix, *args, **kwargs)
+    def __init__(self, *args, prefix=None, **kwargs):
+        super().__init__(*args, prefix=prefix, **kwargs)
         for name, field in self.fields.items():
             if isinstance(field, FormsetField):
                 if prefix:

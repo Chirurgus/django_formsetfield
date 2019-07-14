@@ -18,7 +18,7 @@ class FormsetWidget(Widget):
     template_name = 'formsetwidget/formset.html'
     needs_multipart_form = True
 
-    def __init__(self, field_instance, *args, **kwargs):
+    def __init__(self, *args, field_instance, **kwargs):
         self.field_instance = field_instance
         super(FormsetWidget, self).__init__(*args, **kwargs)
 
