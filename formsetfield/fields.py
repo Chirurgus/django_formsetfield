@@ -81,19 +81,54 @@ from .widgets import FormsetWidget
 
 class FormsetField(Field):
     """
-    Field that can have display an entire formset.
+    Allows to have a formset as a field in a form.
+
+    Has to be used inside a Formclass deriving from
+    @class(FormsetFieldFormMixin).
+
+    The trickiest part of the implementation is 
+    having correct id/names for the forms in the
+    formset.
+    This is accomplished by having the form set
+    the self.prefix property with the name of the
+    field + prefix from the enclosing formset (if any).
+    This is done in the FOrmsetFIeldFormMixin, hence
+    the requirement to be in a form derving form it.
     """
     widget_class = FormsetWidget
     prefix = "formset_field"
 
     def __init__(self, *, formset_class, **kwargs):
-        if formset_class is None:
-            raise ValueError('formset argument has to be not None.')
-        widget = self.widget_class(formset_class=formset_class,
-                                   prefix=self.prefix)
+        # Ignore 'initial' argument
+        kwargs.pop('initial', None)
+        # Instantiate the widget, passing it 'self'
+        # so that it can retrieve an update prefix
+        widget = self.widget_class(field_instance=self)
         # Super will assign self.widget
-        super().__init__(widget=widget, **kwargs)
-        self.initial = formset_class(prefix=self.prefix)
+        super().__init__(widget=widget,**kwargs)
+        # Save formset_class
+        self.formset_class = formset_class
+
+    @property
+    def initial(self):
+        '''
+        Returns the inital formset instance.
+        This needs to be a method since we need to push back
+        the formset instantiation as late as possible so 
+        that the self.prefix property is set by the 
+        form mixin __init__ (which happens only when the
+        form is instantiated in a view).
+        '''
+        return self.formset_class(prefix=self.prefix)
+    
+    @initial.setter
+    def initial(self, val):
+        '''
+        Set 'initial' property.
+        Ignores input value, since intial has to be an instance of a specific
+        formset class.
+        '''
+        pass
 
     def clean(self, value):
         '''
@@ -108,14 +143,3 @@ class FormsetField(Field):
         '''
         # value should already be a Formset with data
         return value
-
-
-    def get_prefix(self, form, name):
-        """
-        Return the prefix that is used for the formset.
-        """
-        return '{form_prefix}{prefix_name}-{field_name}'.format(
-            form_prefix=form.prefix + '-' if form.prefix else '',
-            prefix_name=self.prefix_name,
-            field_name=name)
-
