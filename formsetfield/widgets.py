@@ -20,7 +20,7 @@ class FormsetWidget(Widget):
 
     def __init__(self, *args, field_instance, **kwargs):
         self.field_instance = field_instance
-        super(FormsetWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def value_from_datadict(self, data, files, name):
         '''
@@ -50,3 +50,15 @@ class FormsetWidget(Widget):
         context = super(FormsetWidget, self).get_context(name, value, attrs)
         context['formset'] = value
         return context
+
+class ModelFormsetWidget(FormsetWidget):
+    def value_from_datadict(self, data, files, name):
+        '''
+        Same as FormsetWidget.value_from_datadict, but also passes
+        the model instance to the formset
+        '''
+        return self.field_instance.formset_class(
+            data,
+            files,
+            instance=self.field_instance.instance,
+            prefix= name)

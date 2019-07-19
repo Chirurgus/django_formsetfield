@@ -75,8 +75,6 @@ functions get called when they're called on the enclosing form.
 form gets value form formfield.widget
 '''
 
-from django.forms.fields import Field
-
 from .widgets import FormsetWidget
 
 class FormsetField(Field):
@@ -92,8 +90,8 @@ class FormsetField(Field):
     This is accomplished by having the form set
     the self.prefix property with the name of the
     field + prefix from the enclosing formset (if any).
-    This is done in the FOrmsetFIeldFormMixin, hence
-    the requirement to be in a form derving form it.
+    This is done in the FormsetFieldFormMixin, hence
+    the requirement to be in a form deriving form it.
     """
     widget_class = FormsetWidget
 
@@ -124,7 +122,7 @@ class FormsetField(Field):
     def initial(self, val):
         '''
         Set 'initial' property.
-        Ignores input value, since intial has to be an instance of a specific
+        Ignores input value, since initial has to be an instance of a specific
         formset class.
         '''
         pass
@@ -144,3 +142,12 @@ class FormsetField(Field):
         '''
         # value should already be a Formset with data
         return value
+
+class ModelFormsetField(FormsetField):
+    @property
+    def initial(self):
+        '''
+        Same as FormsetField.initial(), but also passes the model
+        instance.
+        '''
+        return self.formset_class(instance=self.instance, prefix=self.prefix)
