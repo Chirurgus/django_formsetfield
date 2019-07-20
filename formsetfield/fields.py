@@ -74,6 +74,7 @@ functions get called when they're called on the enclosing form.
 
 form gets value form formfield.widget
 '''
+from django.forms.fields import Field
 
 from .widgets import FormsetWidget
 
@@ -94,13 +95,19 @@ class FormsetField(Field):
     the requirement to be in a form deriving form it.
     """
     widget_class = FormsetWidget
+    
+    # initial = the formset
+    # _initial = the initial argument to the formset
+    _initial = None
 
     def __init__(self, *, formset_class, **kwargs):
-        # Ignore 'initial' argument
-        kwargs.pop('initial', None)
+        # Ignore 'initial' argument, we handle it ourselves
+        self._initial = kwargs.pop('initial', None)
+
         # Instantiate the widget, passing it 'self'
         # so that it can retrieve an update prefix
         widget = self.widget_class(field_instance=self)
+
         # Super will assign self.widget
         super().__init__(widget=widget,**kwargs)
         # Save formset_class
@@ -116,14 +123,13 @@ class FormsetField(Field):
         form mixin __init__ (which happens only when the
         form is instantiated in a view).
         '''
-        return self.formset_class(prefix=self.prefix)
+        return self.formset_class(prefix=self.prefix, initial=self._initial)
     
     @initial.setter
     def initial(self, val):
         '''
-        Set 'initial' property.
-        Ignores input value, since initial has to be an instance of a specific
-        formset class.
+        Set '_initial' property. It is passed to the self.formset_class
+        as the 'initial' argument.
         '''
         pass
 
@@ -144,6 +150,12 @@ class FormsetField(Field):
         return value
 
 class ModelFormsetField(FormsetField):
+    # Instance of the model. Set from ModelFormsetFieldFormMixin.__init__.
+    instance = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     @property
     def initial(self):
         '''
@@ -151,3 +163,7 @@ class ModelFormsetField(FormsetField):
         instance.
         '''
         return self.formset_class(instance=self.instance, prefix=self.prefix)
+    
+    @initial.setter
+    def initial(self, value):
+        pass

@@ -11,23 +11,23 @@ from django.views.generic import (
     CreateView,
 )
 
-from .forms import TestFormsetForm, TestNestedFormsetForm
+from .forms import TestFormsetForm, TestNestedFormsetForm, TestRecipeForm
 
 class TestView(View):
     template_name = 'testform.html'
 
     def get(self, request):
-        form = TestNestedFormsetForm()
+        #form = TestNestedFormsetForm()
+        form = TestRecipeForm()
 
         return render(request,
                       self.template_name,
                       { 'form' : form })
 
     def post(self, request):
-        form = TestNestedFormsetForm(request.POST, request.FILES)
+        #form = TestNestedFormsetForm(request.POST, request.FILES)
+        form = TestRecipeForm(request.POST, request.FILES)
 
-        # Look at the prefix
-        form.fields['nested_formset'].prefix
 
         if form.is_valid():
             return render(request, "sucess.html")
