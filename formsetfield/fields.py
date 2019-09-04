@@ -76,7 +76,7 @@ form gets value form formfield.widget
 '''
 from django.forms.fields import Field
 
-from .widgets import FormsetWidget
+from .widgets import FormsetWidget, ModelFormsetWidget
 
 class FormsetField(Field):
     """
@@ -150,11 +150,9 @@ class FormsetField(Field):
         return value
 
 class ModelFormsetField(FormsetField):
+    widget_class = ModelFormsetWidget
     # Instance of the model. Set from ModelFormsetFieldFormMixin.__init__.
     instance = None
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     @property
     def initial(self):
