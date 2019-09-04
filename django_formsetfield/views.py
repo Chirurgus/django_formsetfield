@@ -12,13 +12,18 @@ from django.views.generic import (
 )
 
 from .forms import TestFormsetForm, TestNestedFormsetForm, TestRecipeForm
+from .models import Recipe
 
 class TestView(View):
     template_name = 'testform.html'
 
     def get(self, request):
         #form = TestNestedFormsetForm()
-        form = TestRecipeForm()
+
+        #form = TestRecipeForm()
+
+        r = Recipe.objects.all()[0]
+        form = TestRecipeForm(instance=r)
 
         return render(request,
                       self.template_name,
@@ -26,7 +31,11 @@ class TestView(View):
 
     def post(self, request):
         #form = TestNestedFormsetForm(request.POST, request.FILES)
-        form = TestRecipeForm(request.POST, request.FILES)
+
+        #form = TestRecipeForm(request.POST, request.FILES)
+
+        r = Recipe.objects.all()[0]
+        form = TestRecipeForm(data=request.POST, files=request.FILES, instance=r)
 
 
         if form.is_valid():
@@ -34,8 +43,8 @@ class TestView(View):
 
         else:
             return render(request,
-                    self.template_name,
-                    { 'form' : form })
+                          self.template_name,
+                          { 'form' : form })
 
 '''
 class RecipeCreate(View):

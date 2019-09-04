@@ -24,7 +24,7 @@ class TestNestedFormsetForm(InitFormsetFieldFormMixin, Form):
     title = CharField(max_length=100)
     nested_formset= FormsetField(formset_class=TestNestedFormset)
 
-class TestIngredientForm(ModelFormsetFieldFormMixin, ModelForm):
+class TestIngredientForm(ModelForm):
     class Meta:
         model= Ingredient
         fields= ['ingredient']
