@@ -5,7 +5,7 @@ from django.forms.fields import CharField
 from formsetfield.fields  import FormsetField, ModelFormsetField
 from formsetfield.forms import InitFormsetFieldFormMixin, ModelFormsetFieldFormMixin
 
-from .models import Recipe, Ingredient
+from .models import Recipe, Ingredient, Notes
 
 class TestForm(InitFormsetFieldFormMixin,Form):
     name = CharField(max_length= 100)
@@ -24,7 +24,16 @@ class TestNestedFormsetForm(InitFormsetFieldFormMixin, Form):
     title = CharField(max_length=100)
     nested_formset= FormsetField(formset_class=TestNestedFormset)
 
-class TestIngredientForm(ModelForm):
+class TestNoteForm(ModelFormsetFieldFormMixin, ModelForm):
+    class Meta:
+        model = Notes
+        fields = ['note']
+
+NotesFormset = inlineformset_factory(Ingredient, Notes, form= TestNoteForm, extra=3)
+
+class TestIngredientForm(ModelFormsetFieldFormMixin, ModelForm):
+    notes = ModelFormsetField(formset_class=NotesFormset)
+
     class Meta:
         model= Ingredient
         fields= ['ingredient']

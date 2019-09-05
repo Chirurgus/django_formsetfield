@@ -39,8 +39,8 @@ class TestView(View):
 
 
         if form.is_valid():
+            form.save(commit=True)
             return render(request, "sucess.html")
-
         else:
             return render(request,
                           self.template_name,

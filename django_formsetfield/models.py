@@ -10,4 +10,7 @@ class Ingredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ingredients")
     ingredient = models.CharField(max_length=100, null= True, blank= True)
 
+class Notes(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="notes")
+    note = models.CharField(max_length=100, null= True, blank= True)
 
