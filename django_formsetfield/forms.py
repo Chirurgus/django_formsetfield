@@ -1,48 +1,52 @@
+from django.forms import Form
 
-from django.forms import (Form, formset_factory, ModelForm, inlineformset_factory,)
-from django.forms.fields import CharField
+from .fields import FormsetField
 
-from formsetfield.fields  import FormsetField, ModelFormsetField
-from formsetfield.forms import FormsetFieldFormMixin, ModelFormsetFieldFormMixin
+class FormsetFieldFormMixin(object):
+    '''
+    Sets the prefix for the FormsetField,
+    so that when a form with a FormsetField
+    it itself put into a formset there are
+    no naming/id conflicts.
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if isinstance(field, FormsetField):
+                field.prefix = self.add_prefix(name)
+                # Need to update field instance since it still refences
+                # the field from which it was initialized (i.e. the field 
+                # from self.base_fields)
+                field.widget.field_instance = field
 
-from .models import Recipe, Ingredient, Notes
+class ModelFormsetFieldFormMixin(FormsetFieldFormMixin):
+    '''
+    Allows the use of ModelFormsetField in a form.
+    '''
+    def __init__(self, *args, instance=None, **kwargs):
+        super().__init__(instance=instance, *args, **kwargs)
+        for field in self.fields.values():
+            if isinstance(field, FormsetField):
+                field.instance = instance
+                
+    
+    def save(self, commit=True):
+        instance = super().save(commit)
+        for name, field in self.fields.items():
+            if isinstance(field, FormsetField):
+                self.cleaned_data[name].instance = instance
+                self.cleaned_data[name].save(commit)
+        return instance
 
-class TestForm(FormsetFieldFormMixin,Form):
-    name = CharField(max_length= 100)
-
-class TestInlineForm(FormsetFieldFormMixin, Form):
-    field = CharField(max_length=10)
-
-TestFormset = formset_factory(TestInlineForm, extra=2)
-
-class TestFormsetForm(FormsetFieldFormMixin, Form):
-    test_forms = FormsetField(formset_class= TestFormset)
-
-TestNestedFormset = formset_factory(TestFormsetForm, extra=2)
-
-class TestNestedFormsetForm(FormsetFieldFormMixin, Form):
-    title = CharField(max_length=100)
-    nested_formset= FormsetField(formset_class=TestNestedFormset)
-
-class TestNoteForm(ModelFormsetFieldFormMixin, ModelForm):
-    class Meta:
-        model = Notes
-        fields = ['note']
-
-NotesFormset = inlineformset_factory(Ingredient, Notes, form= TestNoteForm, extra=3)
-
-class TestIngredientForm(ModelFormsetFieldFormMixin, ModelForm):
-    notes = ModelFormsetField(formset_class=NotesFormset)
-
-    class Meta:
-        model= Ingredient
-        fields= ['ingredient']
-
-IngredientFormset = inlineformset_factory(Recipe, Ingredient, form= TestIngredientForm, extra=3)
-
-class TestRecipeForm(ModelFormsetFieldFormMixin, ModelForm):
-    ingredients = ModelFormsetField(formset_class=IngredientFormset)
-
-    class Meta:
-        model= Recipe
-        fields= ['name']
+    def is_valid(self):
+        valid = super().is_valid()
+        if not valid:
+            return False
+        instance = self.save(commit=False)
+        for name, field in self.fields.items():
+            if isinstance(field, FormsetField):
+                # Set the instance so that
+                # the .is_valid method can work
+                self.cleaned_data[name].instance = instance
+                valid = valid and self.cleaned_data[name].is_valid()
+        return valid
