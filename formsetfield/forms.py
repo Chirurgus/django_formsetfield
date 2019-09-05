@@ -2,7 +2,7 @@ from django.forms import Form
 
 from .fields import FormsetField
 
-class InitFormsetFieldFormMixin(object):
+class FormsetFieldFormMixin(object):
     '''
     Sets the prefix for the FormsetField,
     so that when a form with a FormsetField
@@ -19,8 +19,9 @@ class InitFormsetFieldFormMixin(object):
                 # from self.base_fields)
                 field.widget.field_instance = field
 
-class ModelFormsetFieldFormMixin(InitFormsetFieldFormMixin):
+class ModelFormsetFieldFormMixin(FormsetFieldFormMixin):
     '''
+    Allows the use of ModelFormsetField in a form.
     '''
     def __init__(self, *args, instance=None, **kwargs):
         super().__init__(instance=instance, *args, **kwargs)

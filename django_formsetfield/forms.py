@@ -3,24 +3,24 @@ from django.forms import (Form, formset_factory, ModelForm, inlineformset_factor
 from django.forms.fields import CharField
 
 from formsetfield.fields  import FormsetField, ModelFormsetField
-from formsetfield.forms import InitFormsetFieldFormMixin, ModelFormsetFieldFormMixin
+from formsetfield.forms import FormsetFieldFormMixin, ModelFormsetFieldFormMixin
 
 from .models import Recipe, Ingredient, Notes
 
-class TestForm(InitFormsetFieldFormMixin,Form):
+class TestForm(FormsetFieldFormMixin,Form):
     name = CharField(max_length= 100)
 
-class TestInlineForm(InitFormsetFieldFormMixin, Form):
+class TestInlineForm(FormsetFieldFormMixin, Form):
     field = CharField(max_length=10)
 
 TestFormset = formset_factory(TestInlineForm, extra=2)
 
-class TestFormsetForm(InitFormsetFieldFormMixin, Form):
+class TestFormsetForm(FormsetFieldFormMixin, Form):
     test_forms = FormsetField(formset_class= TestFormset)
 
 TestNestedFormset = formset_factory(TestFormsetForm, extra=2)
 
-class TestNestedFormsetForm(InitFormsetFieldFormMixin, Form):
+class TestNestedFormsetForm(FormsetFieldFormMixin, Form):
     title = CharField(max_length=100)
     nested_formset= FormsetField(formset_class=TestNestedFormset)
 
