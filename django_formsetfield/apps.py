@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class FormsetFieldConfig(AppConfig):
-    name = 'formsetfield'
+class Django_FormsetFieldConfig(AppConfig):
+    name = 'django_formsetfield'
