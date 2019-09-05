@@ -106,7 +106,15 @@ class FormsetField(Field):
 
         # Instantiate the widget, passing it 'self'
         # so that it can retrieve an update prefix
-        widget = self.widget_class(field_instance=self)
+        widget = kwargs.pop('widget', None)
+        if widget is None or isinstance(widget, type) :
+            # Ignore the passed widget class
+            widget = self.widget_class(field_instance=self)
+        else:
+            if not isinstance(widget, self.widget_class):
+                raise TypeError("widget has to be an instance of FormsetWidget")
+            else:
+                widget.field_instance = self
 
         # Super will assign self.widget
         super().__init__(widget=widget,**kwargs)
