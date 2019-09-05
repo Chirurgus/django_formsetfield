@@ -15,7 +15,7 @@ class FormsetWidget(Widget):
     to use. This is necessary since the correct
     prefix is not known on __init__ time.
     '''
-    template_name = 'formsetwidget/formset.html'
+    template_name = 'django_formsetwidget/formset.html'
     needs_multipart_form = True
 
     def __init__(self, *args, field_instance, **kwargs):
